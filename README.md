@@ -2,6 +2,7 @@
 
 <h2>Reupload of the excellent Unity plugin DoomLoader by Risto Paasivirta</h2>
 
+Original DoomLoader v4 zip rehost: https://1drv.ms/u/s!AvBlwMAmRHpymXxQyXWyY1YaF4YW?e=83Lu1H  
 DoomWorld thread for DoomLoader: https://www.doomworld.com/forum/topic/98682-doomloader-for-unity/  
 YouTube video demo by Risto Paasivirta https://www.youtube.com/watch?v=TmlkVsp8TL8 
 
