@@ -4,6 +4,7 @@
 
 Original DoomLoader v4 zip rehost: https://1drv.ms/u/s!AvBlwMAmRHpymXxQyXWyY1YaF4YW?e=83Lu1H  
 DoomWorld thread for DoomLoader: https://www.doomworld.com/forum/topic/98682-doomloader-for-unity/  
+ZDoom thread for DoomLoader: https://forum.zdoom.org/viewtopic.php?f=12&t=59062  
 YouTube video demo by Risto Paasivirta https://www.youtube.com/watch?v=TmlkVsp8TL8 
 
 <h2>Original ReadMe</h2>
