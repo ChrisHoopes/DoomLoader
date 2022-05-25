@@ -1,19 +1,22 @@
 ﻿using UnityEngine;
 
-public class Door46Controller : MonoBehaviour, Damageable
+namespace DoomLoader
 {
-    public SlowOneshotDoorController sectorController;
-
-    public bool Dead { get { return false; } }
-    public bool Bleed { get { return false; } }
-
-    public void Damage(int value, DamageType damageType = DamageType.Generic, GameObject attacker = null)
+    public class Door46Controller : MonoBehaviour, Damageable
     {
-        if (attacker != null)
-            if (attacker.GetComponent<PlayerThing>() != null)
-                if (sectorController.CurrentState == SlowOneshotDoorController.State.Closed)
-                    sectorController.CurrentState = SlowOneshotDoorController.State.Opening;
-    }
+        public SlowOneshotDoorController sectorController;
 
-    public void Impulse(Vector3 direction, float force) { }
+        public bool Dead { get { return false; } }
+        public bool Bleed { get { return false; } }
+
+        public void Damage(int value, DamageType damageType = DamageType.Generic, GameObject attacker = null)
+        {
+            if (attacker != null)
+                if (attacker.GetComponent<PlayerThing>() != null)
+                    if (sectorController.CurrentState == SlowOneshotDoorController.State.Closed)
+                        sectorController.CurrentState = SlowOneshotDoorController.State.Opening;
+        }
+
+        public void Impulse(Vector3 direction, float force) { }
+    }
 }

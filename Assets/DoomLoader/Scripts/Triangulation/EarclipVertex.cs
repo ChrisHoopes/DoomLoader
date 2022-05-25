@@ -17,129 +17,132 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public sealed class EarClipVertex
+namespace DoomLoader
 {
-    #region ================== Variables
-
-    // Position
-    private Vector2 pos;
-
-    // Along a sidedef?
-    private Sidedef sidedef;
-
-    // Lists
-    private LinkedListNode<EarClipVertex> vertslink;
-    private LinkedListNode<EarClipVertex> reflexlink;
-    private LinkedListNode<EarClipVertex> eartiplink;
-
-    #endregion
-
-    #region ================== Properties
-
-    public Vector2 Position { get { return pos; } }
-    internal LinkedListNode<EarClipVertex> MainListNode { get { return vertslink; } }
-    public bool IsReflex { get { return (reflexlink != null); } }
-    public bool IsEarTip { get { return (eartiplink != null); } }
-    internal Sidedef Sidedef { get { return sidedef; } set { sidedef = value; } }
-
-    #endregion
-
-    #region ================== Constructor / Disposer
-
-    // Copy constructor
-    internal EarClipVertex(EarClipVertex v)
+    public sealed class EarClipVertex
     {
-        // Initialize
-        this.pos = v.pos;
-        this.sidedef = v.sidedef;
+        #region ================== Variables
 
-        // We have no destructor
-        GC.SuppressFinalize(this);
-    }
+        // Position
+        private Vector2 pos;
 
-    // Copy constructor
-    internal EarClipVertex(EarClipVertex v, Sidedef sidedef)
-    {
-        // Initialize
-        this.pos = v.pos;
-        this.sidedef = sidedef;
+        // Along a sidedef?
+        private Sidedef sidedef;
 
-        // We have no destructor
-        GC.SuppressFinalize(this);
-    }
+        // Lists
+        private LinkedListNode<EarClipVertex> vertslink;
+        private LinkedListNode<EarClipVertex> reflexlink;
+        private LinkedListNode<EarClipVertex> eartiplink;
 
-    // Constructor
-    internal EarClipVertex(Vector2 v, Sidedef sidedef)
-    {
-        // Initialize
-        this.pos = v;
-        this.sidedef = sidedef;
+        #endregion
 
-        // We have no destructor
-        GC.SuppressFinalize(this);
-    }
+        #region ================== Properties
 
-    // Disposer
-    internal void Dispose()
-    {
-        reflexlink = null;
-        eartiplink = null;
-        vertslink = null;
-        sidedef = null;
-    }
+        public Vector2 Position { get { return pos; } }
+        internal LinkedListNode<EarClipVertex> MainListNode { get { return vertslink; } }
+        public bool IsReflex { get { return (reflexlink != null); } }
+        public bool IsEarTip { get { return (eartiplink != null); } }
+        internal Sidedef Sidedef { get { return sidedef; } set { sidedef = value; } }
 
-    #endregion
+        #endregion
 
-    #region ================== Methods
+        #region ================== Constructor / Disposer
 
-    // This sets the main linked list node
-    internal void SetVertsLink(LinkedListNode<EarClipVertex> link)
-    {
-        this.vertslink = link;
-    }
+        // Copy constructor
+        internal EarClipVertex(EarClipVertex v)
+        {
+            // Initialize
+            this.pos = v.pos;
+            this.sidedef = v.sidedef;
 
-    // This removes the item from all lists
-    internal void Remove()
-    {
-        vertslink.List.Remove(vertslink);
-        if (reflexlink != null) reflexlink.List.Remove(reflexlink);
-        if (eartiplink != null) eartiplink.List.Remove(eartiplink);
-        reflexlink = null;
-        eartiplink = null;
-        vertslink = null;
-    }
+            // We have no destructor
+            GC.SuppressFinalize(this);
+        }
 
-    // This adds to reflexes list
-    public void AddReflex(LinkedList<EarClipVertex> reflexes)
-    {
+        // Copy constructor
+        internal EarClipVertex(EarClipVertex v, Sidedef sidedef)
+        {
+            // Initialize
+            this.pos = v.pos;
+            this.sidedef = sidedef;
+
+            // We have no destructor
+            GC.SuppressFinalize(this);
+        }
+
+        // Constructor
+        internal EarClipVertex(Vector2 v, Sidedef sidedef)
+        {
+            // Initialize
+            this.pos = v;
+            this.sidedef = sidedef;
+
+            // We have no destructor
+            GC.SuppressFinalize(this);
+        }
+
+        // Disposer
+        internal void Dispose()
+        {
+            reflexlink = null;
+            eartiplink = null;
+            vertslink = null;
+            sidedef = null;
+        }
+
+        #endregion
+
+        #region ================== Methods
+
+        // This sets the main linked list node
+        internal void SetVertsLink(LinkedListNode<EarClipVertex> link)
+        {
+            this.vertslink = link;
+        }
+
+        // This removes the item from all lists
+        internal void Remove()
+        {
+            vertslink.List.Remove(vertslink);
+            if (reflexlink != null) reflexlink.List.Remove(reflexlink);
+            if (eartiplink != null) eartiplink.List.Remove(eartiplink);
+            reflexlink = null;
+            eartiplink = null;
+            vertslink = null;
+        }
+
+        // This adds to reflexes list
+        public void AddReflex(LinkedList<EarClipVertex> reflexes)
+        {
 #if DEBUG
-        if (vertslink == null) throw new Exception();
+            if (vertslink == null) throw new Exception();
 #endif
-        if (reflexlink == null) reflexlink = reflexes.AddLast(this);
-    }
+            if (reflexlink == null) reflexlink = reflexes.AddLast(this);
+        }
 
-    // This removes from reflexes list
-    internal void RemoveReflex()
-    {
-        if (reflexlink != null) reflexlink.List.Remove(reflexlink);
-        reflexlink = null;
-    }
+        // This removes from reflexes list
+        internal void RemoveReflex()
+        {
+            if (reflexlink != null) reflexlink.List.Remove(reflexlink);
+            reflexlink = null;
+        }
 
-    // This adds to eartips list
-    internal void AddEarTip(LinkedList<EarClipVertex> eartips)
-    {
+        // This adds to eartips list
+        internal void AddEarTip(LinkedList<EarClipVertex> eartips)
+        {
 #if DEBUG
-        if (vertslink == null) throw new Exception();
+            if (vertslink == null) throw new Exception();
 #endif
-        if (eartiplink == null) eartiplink = eartips.AddLast(this);
-    }
+            if (eartiplink == null) eartiplink = eartips.AddLast(this);
+        }
 
-    // This removes from eartips list
-    internal void RemoveEarTip()
-    {
-        if (eartiplink != null) eartiplink.List.Remove(eartiplink);
-        eartiplink = null;
-    }
+        // This removes from eartips list
+        internal void RemoveEarTip()
+        {
+            if (eartiplink != null) eartiplink.List.Remove(eartiplink);
+            eartiplink = null;
+        }
 
-    #endregion
+        #endregion
+    }
 }

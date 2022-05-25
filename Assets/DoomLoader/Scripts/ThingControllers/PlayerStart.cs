@@ -1,16 +1,17 @@
-﻿using UnityEngine;
-
-public class PlayerStart : ThingController 
+﻿namespace DoomLoader
 {
-    public static PlayerStart[] PlayerStarts = new PlayerStart[4];
-
-    public int PlayerNumber;
-
-    void Awake()
+    public class PlayerStart : ThingController 
     {
-        if (PlayerNumber < 1 || PlayerNumber > 4)
-            Debug.LogError("PlayerStart: Awake: PlayerNumber out of range");
+        public static PlayerStart[] PlayerStarts = new PlayerStart[4];
 
-        PlayerStarts[PlayerNumber - 1] = this;
+        public int PlayerNumber;
+
+        void Awake()
+        {
+            if (PlayerNumber < 1 || PlayerNumber > 4)
+                UnityEngine.Debug.LogError("PlayerStart: Awake: PlayerNumber out of range");
+
+            PlayerStarts[PlayerNumber - 1] = this;
+        }
     }
 }

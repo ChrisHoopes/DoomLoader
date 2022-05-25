@@ -1,245 +1,248 @@
 ﻿using UnityEngine;
 
-public class ThingController : MonoBehaviour 
+namespace DoomLoader
 {
-    public string thingName;
-    public int thingID;
-    public string spriteName;
-    public bool alwaysBright;
-    public bool dynamic;
-    public Sector currentSector;
-
-    protected MeshRenderer mr;
-    protected MaterialPropertyBlock materialProperties;
-
-    public BehaviorBase.Behaviors BehaviorType = BehaviorBase.Behaviors.None;
-    public BehaviorBase CurrentBehavior;
-
-    public enum ThingType
+    public class ThingController : MonoBehaviour 
     {
-        Decor, //non-blocking, non-interactive
-        Neutral, //blocking or interactive
-        Item,
-        Monster
-    }
-    public ThingType thingType = ThingType.Decor;
+        public string thingName;
+        public int thingID;
+        public string spriteName;
+        public bool alwaysBright;
+        public bool dynamic;
+        public Sector currentSector;
 
-    public enum SpriteType
-    {
-        Omni,
-        Axis,
-        TransparentOmni,
-        TransparentAxis
-    }
-    public SpriteType spriteType = SpriteType.Omni;
+        protected MeshRenderer mr;
+        protected MaterialPropertyBlock materialProperties;
 
-    public float gravityAccumulator;
+        public BehaviorBase.Behaviors BehaviorType = BehaviorBase.Behaviors.None;
+        public BehaviorBase CurrentBehavior;
 
-    public void ApplySimpleGravity()
-    {
-        if (currentSector == null)
-            return;
-
-        if (transform.position.y == currentSector.floorHeight)
-            return;
-
-        gravityAccumulator += Time.deltaTime * GameManager.Instance.gravity;
-        if (gravityAccumulator > GameManager.Instance.terminalVelocity)
-            gravityAccumulator = GameManager.Instance.terminalVelocity;
-
-        transform.position += Vector3.down * gravityAccumulator * Time.deltaTime;
-
-        if (transform.position.y < currentSector.floorHeight)
-            transform.position = new Vector3(transform.position.x, currentSector.floorHeight, transform.position.z);
-    }
-
-    public Vec2I cell;
-
-    protected virtual void OnAwake()
-    {
-        mr = GetComponent<MeshRenderer>();
-
-        if (mr != null)
+        public enum ThingType
         {
-            switch(spriteType)
+            Decor, //non-blocking, non-interactive
+            Neutral, //blocking or interactive
+            Item,
+            Monster
+        }
+        public ThingType thingType = ThingType.Decor;
+
+        public enum SpriteType
+        {
+            Omni,
+            Axis,
+            TransparentOmni,
+            TransparentAxis
+        }
+        public SpriteType spriteType = SpriteType.Omni;
+
+        public float gravityAccumulator;
+
+        public void ApplySimpleGravity()
+        {
+            if (currentSector == null)
+                return;
+
+            if (transform.position.y == currentSector.floorHeight)
+                return;
+
+            gravityAccumulator += Time.deltaTime * GameManager.Instance.gravity;
+            if (gravityAccumulator > GameManager.Instance.terminalVelocity)
+                gravityAccumulator = GameManager.Instance.terminalVelocity;
+
+            transform.position += Vector3.down * gravityAccumulator * Time.deltaTime;
+
+            if (transform.position.y < currentSector.floorHeight)
+                transform.position = new Vector3(transform.position.x, currentSector.floorHeight, transform.position.z);
+        }
+
+        public Vec2I cell;
+
+        protected virtual void OnAwake()
+        {
+            mr = GetComponent<MeshRenderer>();
+
+            if (mr != null)
             {
-                case SpriteType.Omni:
-                    mr.material = MaterialManager.Instance.omniBillboardMaterial;
-                    break;
+                switch(spriteType)
+                {
+                    case SpriteType.Omni:
+                        mr.material = MaterialManager.Instance.omniBillboardMaterial;
+                        break;
 
-                case SpriteType.Axis:
-                    mr.material = MaterialManager.Instance.axisBillboardMaterial;
-                    break;
+                    case SpriteType.Axis:
+                        mr.material = MaterialManager.Instance.axisBillboardMaterial;
+                        break;
 
-                case SpriteType.TransparentOmni:
-                    mr.material = MaterialManager.Instance.transparentOmniBillboardMaterial;
-                    break;
+                    case SpriteType.TransparentOmni:
+                        mr.material = MaterialManager.Instance.transparentOmniBillboardMaterial;
+                        break;
 
-                case SpriteType.TransparentAxis:
-                    mr.material = MaterialManager.Instance.transparentAxisBillboardMaterial;
-                    break;
+                    case SpriteType.TransparentAxis:
+                        mr.material = MaterialManager.Instance.transparentAxisBillboardMaterial;
+                        break;
+                }
+            }
+
+            if (BehaviorType != BehaviorBase.Behaviors.None)
+            {
+                CurrentBehavior = BehaviorBase.Instantiate(BehaviorType);
+                CurrentBehavior.owner = this;
+                CurrentBehavior.Init();
             }
         }
 
-        if (BehaviorType != BehaviorBase.Behaviors.None)
+        void Awake()
         {
-            CurrentBehavior = BehaviorBase.Instantiate(BehaviorType);
-            CurrentBehavior.owner = this;
-            CurrentBehavior.Init();
+            OnAwake();
         }
-    }
 
-    void Awake()
-    {
-        OnAwake();
-    }
-
-    public void AddToGrid()
-    {
-        if (!TheGrid.existenceBox.GetValue(cell))
-            return;
-
-        int x = cell.x - TheGrid.origoX;
-        int y = cell.y - TheGrid.origoY;
-
-        switch (thingType)
+        public void AddToGrid()
         {
-            case ThingType.Decor:
-                TheGrid.decorThings[x, y].InsertFront(this);
-                break;
+            if (!TheGrid.existenceBox.GetValue(cell))
+                return;
 
-            case ThingType.Neutral:
-                TheGrid.neutralThings[x, y].InsertFront(this);
-                break;
+            int x = cell.x - TheGrid.origoX;
+            int y = cell.y - TheGrid.origoY;
 
-            case ThingType.Item:
-                TheGrid.itemThings[x, y].InsertFront(this);
-                break;
-
-            case ThingType.Monster:
-                TheGrid.monsterThings[x, y].InsertFront(this);
-                break;
-        }
-    }
-
-    public void RemoveFromGrid()
-    {
-        int x = cell.x - TheGrid.origoX;
-        int y = cell.y - TheGrid.origoY;
-
-        if (TheGrid.existenceBox.GetValue(cell))
-        {
             switch (thingType)
             {
                 case ThingType.Decor:
-                    TheGrid.decorThings[x, y].DestroyContainingNode(this);
+                    TheGrid.decorThings[x, y].InsertFront(this);
                     break;
 
                 case ThingType.Neutral:
-                    TheGrid.neutralThings[x, y].DestroyContainingNode(this);
+                    TheGrid.neutralThings[x, y].InsertFront(this);
                     break;
 
                 case ThingType.Item:
-                    TheGrid.itemThings[x, y].DestroyContainingNode(this);
+                    TheGrid.itemThings[x, y].InsertFront(this);
                     break;
 
                 case ThingType.Monster:
-                    TheGrid.monsterThings[x, y].DestroyContainingNode(this);
+                    TheGrid.monsterThings[x, y].InsertFront(this);
                     break;
             }
         }
-    }
 
-    public virtual void Init()
-    {
-        materialProperties = new MaterialPropertyBlock();
-
-        cell.x = Mathf.FloorToInt(transform.position.x);
-        cell.y = Mathf.FloorToInt(transform.position.z);
-
-        AddToGrid();
-
-        Triangle sectorTriangle = TheGrid.GetExactTriangle(transform.position);
-        if (sectorTriangle == null)
+        public void RemoveFromGrid()
         {
-            Debug.Log("Thing \"" + thingName + "\" no sector found.");
-            Destroy(gameObject);
-            return;
+            int x = cell.x - TheGrid.origoX;
+            int y = cell.y - TheGrid.origoY;
+
+            if (TheGrid.existenceBox.GetValue(cell))
+            {
+                switch (thingType)
+                {
+                    case ThingType.Decor:
+                        TheGrid.decorThings[x, y].DestroyContainingNode(this);
+                        break;
+
+                    case ThingType.Neutral:
+                        TheGrid.neutralThings[x, y].DestroyContainingNode(this);
+                        break;
+
+                    case ThingType.Item:
+                        TheGrid.itemThings[x, y].DestroyContainingNode(this);
+                        break;
+
+                    case ThingType.Monster:
+                        TheGrid.monsterThings[x, y].DestroyContainingNode(this);
+                        break;
+                }
+            }
         }
 
-        currentSector = sectorTriangle.sector;
-        transform.position = new Vector3(transform.position.x, currentSector.floorHeight, transform.position.z);
-
-        if (mr != null)
+        public virtual void Init()
         {
-            mr.GetPropertyBlock(materialProperties);
-            materialProperties.SetFloat("_SectorLight", alwaysBright ? 1f : currentSector.brightness);
-            mr.SetPropertyBlock(materialProperties);
-        }
+            materialProperties = new MaterialPropertyBlock();
 
-        CreateBillboard();
+            cell.x = Mathf.FloorToInt(transform.position.x);
+            cell.y = Mathf.FloorToInt(transform.position.z);
 
-        if (currentSector.Dynamic)
-            dynamic = true; //things need to update when on elevators, crushers, etc
-        
-        if (!dynamic)
-            enabled = false;
+            AddToGrid();
 
-        SectorController sc = currentSector.floorObject;
-        if (dynamic)
-            sc.DynamicThings.AddFirst(this);
-        else
-            sc.StaticThings.Add(this);
-    }
+            Triangle sectorTriangle = TheGrid.GetExactTriangle(transform.position);
+            if (sectorTriangle == null)
+            {
+                UnityEngine.Debug.Log("Thing \"" + thingName + "\" no sector found.");
+                Destroy(gameObject);
+                return;
+            }
 
-    void OnDestroy()
-    {
-        SectorController sc = null;
-        if (currentSector != null)
-            if (currentSector.floorObject != null)
-                 sc = currentSector.floorObject;
-
-        if (sc != null)
-            if (dynamic)
-                sc.DynamicThings.Remove(this);
-            else
-                sc.StaticThings.Remove(this);
-
-        RemoveFromGrid();
-    }
-
-    void Update()
-    {
-        if (currentSector != null)
+            currentSector = sectorTriangle.sector;
             transform.position = new Vector3(transform.position.x, currentSector.floorHeight, transform.position.z);
-    }
 
-    protected virtual void CreateBillboard()
-    {
-        if (mr == null)
-            return;
+            if (mr != null)
+            {
+                mr.GetPropertyBlock(materialProperties);
+                materialProperties.SetFloat("_SectorLight", alwaysBright ? 1f : currentSector.brightness);
+                mr.SetPropertyBlock(materialProperties);
+            }
 
-        if (!string.IsNullOrEmpty(spriteName))
+            CreateBillboard();
+
+            if (currentSector.Dynamic)
+                dynamic = true; //things need to update when on elevators, crushers, etc
+        
+            if (!dynamic)
+                enabled = false;
+
+            SectorController sc = currentSector.floorObject;
+            if (dynamic)
+                sc.DynamicThings.AddFirst(this);
+            else
+                sc.StaticThings.Add(this);
+        }
+
+        void OnDestroy()
         {
-            Texture tex = TextureLoader.Instance.GetSpriteTexture(spriteName);
-            Mesh mesh = Mesher.CreateBillboardMesh((float)tex.width / MapLoader.sizeDividor, (float)tex.height / MapLoader.sizeDividor, .5f, 0);
-            GetComponent<MeshFilter>().mesh = mesh;
+            SectorController sc = null;
+            if (currentSector != null)
+                if (currentSector.floorObject != null)
+                    sc = currentSector.floorObject;
 
-            materialProperties.SetTexture("_MainTex", tex);
+            if (sc != null)
+                if (dynamic)
+                    sc.DynamicThings.Remove(this);
+                else
+                    sc.StaticThings.Remove(this);
+
+            RemoveFromGrid();
+        }
+
+        void Update()
+        {
+            if (currentSector != null)
+                transform.position = new Vector3(transform.position.x, currentSector.floorHeight, transform.position.z);
+        }
+
+        protected virtual void CreateBillboard()
+        {
+            if (mr == null)
+                return;
+
+            if (!string.IsNullOrEmpty(spriteName))
+            {
+                Texture tex = TextureLoader.Instance.GetSpriteTexture(spriteName);
+                Mesh mesh = Mesher.CreateBillboardMesh((float)tex.width / MapLoader.sizeDividor, (float)tex.height / MapLoader.sizeDividor, .5f, 0);
+                GetComponent<MeshFilter>().mesh = mesh;
+
+                materialProperties.SetTexture("_MainTex", tex);
+                mr.SetPropertyBlock(materialProperties);
+            }
+        }
+
+        public void SetBrightness(float value)
+        {
+            if (mr == null)
+                return;
+
+            if (alwaysBright)
+                return;
+
+            mr.GetPropertyBlock(materialProperties);
+            materialProperties.SetFloat("_SectorLight", value);
             mr.SetPropertyBlock(materialProperties);
         }
-    }
-
-    public void SetBrightness(float value)
-    {
-        if (mr == null)
-            return;
-
-        if (alwaysBright)
-            return;
-
-        mr.GetPropertyBlock(materialProperties);
-        materialProperties.SetFloat("_SectorLight", value);
-        mr.SetPropertyBlock(materialProperties);
     }
 }

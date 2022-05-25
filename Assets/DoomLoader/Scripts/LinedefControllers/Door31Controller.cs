@@ -1,34 +1,37 @@
 ﻿using UnityEngine;
 
-public class Door31Controller : MonoBehaviour, Pokeable
+namespace DoomLoader
 {
-    public SlowOneshotDoorController sectorController;
-
-    public int requiresKeycard = -1;
-
-    public bool Poke(GameObject caller)
+    public class Door31Controller : MonoBehaviour, Pokeable
     {
-        if (requiresKeycard != -1)
-        {
-            PlayerInfo p = caller.GetComponent<PlayerInfo>();
-            if (p == null)
-                return false;
+        public SlowOneshotDoorController sectorController;
 
-            if (!p.Keycards[requiresKeycard])
-                return false;
+        public int requiresKeycard = -1;
+
+        public bool Poke(GameObject caller)
+        {
+            if (requiresKeycard != -1)
+            {
+                PlayerInfo p = caller.GetComponent<PlayerInfo>();
+                if (p == null)
+                    return false;
+
+                if (!p.Keycards[requiresKeycard])
+                    return false;
+            }
+
+            if (sectorController.CurrentState == SlowOneshotDoorController.State.Closed)
+            {
+                sectorController.CurrentState = SlowOneshotDoorController.State.Opening;
+                return true;
+            }
+
+            return false;
         }
 
-        if (sectorController.CurrentState == SlowOneshotDoorController.State.Closed)
+        public bool AllowMonsters()
         {
-            sectorController.CurrentState = SlowOneshotDoorController.State.Opening;
-            return true;
+            return false;
         }
-
-        return false;
-    }
-
-    public bool AllowMonsters()
-    {
-        return false;
     }
 }

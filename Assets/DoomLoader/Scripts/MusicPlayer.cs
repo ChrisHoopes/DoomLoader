@@ -1,36 +1,39 @@
-﻿using UnityEngine;
-using System;
+﻿using System;
+using UnityEngine;
 
-public class MusicPlayer : MonoBehaviour
+namespace DoomLoader
 {
-    [Serializable]
-    public struct LevelMusic
+    public class MusicPlayer : MonoBehaviour
     {
-        public string LevelName;
-        public AudioClip MusicFile;
-    }
+        [Serializable]
+        public struct LevelMusic
+        {
+            public string LevelName;
+            public AudioClip MusicFile;
+        }
 
-    public LevelMusic[] levelMusics = new LevelMusic[0];
+        public LevelMusic[] levelMusics = new LevelMusic[0];
 
-    public static MusicPlayer Instance;
-    [HideInInspector]
-    public AudioSource audioSource;
+        public static MusicPlayer Instance;
+        [HideInInspector]
+        public AudioSource audioSource;
 
-    void Awake()
-    {
-        Instance = this;
-        audioSource = GetComponent<AudioSource>();
-    }
+        void Awake()
+        {
+            Instance = this;
+            audioSource = GetComponent<AudioSource>();
+        }
 
-    public void Play(string levelName)
-    {
-        audioSource.Stop();
+        public void Play(string levelName)
+        {
+            audioSource.Stop();
 
-        foreach (LevelMusic music in levelMusics)
-            if (music.LevelName == levelName)
-            {
-                audioSource.clip = music.MusicFile;
-                audioSource.Play();
-            }
+            foreach (LevelMusic music in levelMusics)
+                if (music.LevelName == levelName)
+                {
+                    audioSource.clip = music.MusicFile;
+                    audioSource.Play();
+                }
+        }
     }
 }

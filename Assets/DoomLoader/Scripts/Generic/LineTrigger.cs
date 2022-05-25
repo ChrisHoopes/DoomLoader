@@ -1,12 +1,15 @@
-﻿using UnityEngine;
-using System;
+﻿using System;
+using UnityEngine;
 
-public class LineTrigger : MonoBehaviour 
+namespace DoomLoader
 {
-    public Action<Collider> TriggerAction;
-
-    void OnTriggerEnter(Collider other)
+    public class LineTrigger : MonoBehaviour 
     {
-        TriggerAction.Invoke(other);
+        public Action<Collider> TriggerAction;
+
+        void OnTriggerEnter(Collider other)
+        {
+            TriggerAction.Invoke(other);
+        }
     }
 }

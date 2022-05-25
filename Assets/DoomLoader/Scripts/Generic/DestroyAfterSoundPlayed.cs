@@ -1,17 +1,20 @@
 ﻿using UnityEngine;
 
-public class DestroyAfterSoundPlayed : MonoBehaviour 
+namespace DoomLoader
 {
-    public AudioSource audioSource;
-
-    void Awake()
+    public class DestroyAfterSoundPlayed : MonoBehaviour 
     {
-        audioSource = GetComponent<AudioSource>();
-    }
+        public AudioSource audioSource;
 
-    void Update()
-    {
-        if (!audioSource.isPlaying)
-            Destroy(gameObject);
+        void Awake()
+        {
+            audioSource = GetComponent<AudioSource>();
+        }
+
+        void Update()
+        {
+            if (!audioSource.isPlaying)
+                Destroy(gameObject);
+        }
     }
 }

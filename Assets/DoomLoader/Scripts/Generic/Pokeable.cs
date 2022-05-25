@@ -1,7 +1,10 @@
 ﻿using UnityEngine;
 
-public interface Pokeable
+namespace DoomLoader
 {
-    bool Poke(GameObject caller);
-    bool AllowMonsters();
+    public interface Pokeable
+    {
+        bool Poke(GameObject caller);
+        bool AllowMonsters();
+    }
 }

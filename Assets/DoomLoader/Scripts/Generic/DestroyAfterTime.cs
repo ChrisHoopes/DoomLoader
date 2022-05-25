@@ -1,19 +1,22 @@
 ﻿using UnityEngine;
 
-public class DestroyAfterTime : MonoBehaviour 
+namespace DoomLoader
 {
-    public float _lifeTime = 1;
-    float time = 0f;
-
-    void Update()
+    public class DestroyAfterTime : MonoBehaviour 
     {
-        //so we clear visual effects at the end of campaign
-        if (GameManager.Paused && !PlayerInfo.GameFinished)
-            return;
+        public float _lifeTime = 1;
+        float time = 0f;
 
-        time += Time.deltaTime;
+        void Update()
+        {
+            //so we clear visual effects at the end of campaign
+            if (GameManager.Paused && !PlayerInfo.GameFinished)
+                return;
 
-        if (time >= _lifeTime)
-            Destroy(gameObject);
+            time += Time.deltaTime;
+
+            if (time >= _lifeTime)
+                Destroy(gameObject);
+        }
     }
 }

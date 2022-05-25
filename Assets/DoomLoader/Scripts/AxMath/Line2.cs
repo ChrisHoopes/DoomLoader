@@ -1,15 +1,18 @@
 ﻿using UnityEngine;
 
-public struct Line2
+namespace DoomLoader
 {
-    public Vector2 start;
-    public Vector2 end;
-
-    public Vector2 center { get { return (start + end) * .5f; } }
-
-    public Line2(Vector2 Start, Vector2 End)
+    public struct Line2
     {
-        start = Start;
-        end = End;
+        public Vector2 start;
+        public Vector2 end;
+
+        public Vector2 center { get { return (start + end) * .5f; } }
+
+        public Line2(Vector2 Start, Vector2 End)
+        {
+            start = Start;
+            end = End;
+        }
     }
 }

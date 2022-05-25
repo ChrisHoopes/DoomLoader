@@ -1,34 +1,37 @@
 ﻿using UnityEngine;
 
-public class PlayerCamera : MonoBehaviour
+namespace DoomLoader
 {
-    public static PlayerCamera Instance;
-    PlayerControls playerControls;
-
-    void Awake()
+    public class PlayerCamera : MonoBehaviour
     {
-        Instance = this;
+        public static PlayerCamera Instance;
+        PlayerControls playerControls;
 
-        playerControls = GetComponentInParent<PlayerControls>();
-    }
+        void Awake()
+        {
+            Instance = this;
 
-    float interp;
-    public bool bopActive;
+            playerControls = GetComponentInParent<PlayerControls>();
+        }
 
-    void Update()
-    {
-        if (GameManager.Paused)
-            return;
+        float interp;
+        public bool bopActive;
 
-        if (Options.HeadBob && bopActive)
-            interp = Mathf.Lerp(interp, 1, Time.deltaTime * 5);
-        else
-            interp = Mathf.Lerp(interp, 0, Time.deltaTime * 6);
+        void Update()
+        {
+            if (GameManager.Paused)
+                return;
 
-        //apply bop
-        transform.localPosition = new Vector3(0, .35f + Mathf.Sin(Time.time * 10) * .15f * interp, 0);
+            if (Options.HeadBob && bopActive)
+                interp = Mathf.Lerp(interp, 1, Time.deltaTime * 5);
+            else
+                interp = Mathf.Lerp(interp, 0, Time.deltaTime * 6);
+
+            //apply bop
+            transform.localPosition = new Vector3(0, .35f + Mathf.Sin(Time.time * 10) * .15f * interp, 0);
         
-        //look up and down
-        transform.localRotation = Quaternion.Euler(playerControls.viewDirection.x, 0, 0);
+            //look up and down
+            transform.localRotation = Quaternion.Euler(playerControls.viewDirection.x, 0, 0);
+        }
     }
 }

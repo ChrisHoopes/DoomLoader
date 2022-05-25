@@ -1,29 +1,32 @@
 ﻿using UnityEngine;
 
-/// <summary>
-/// Used by linedef 48
-/// </summary>
-public class ScrollLeftAnimation : MonoBehaviour
+namespace DoomLoader
 {
-    MeshRenderer mr;
-
-    MaterialPropertyBlock materialParameters;
-
-    void Awake()
+    /// <summary>
+    /// Used by linedef 48
+    /// </summary>
+    public class ScrollLeftAnimation : MonoBehaviour
     {
-        mr = GetComponent<MeshRenderer>();
-        materialParameters = new MaterialPropertyBlock();
-    }
+        MeshRenderer mr;
 
-    float offset = 0;
+        MaterialPropertyBlock materialParameters;
 
-    void Update()
-    {
-        offset += Time.deltaTime * .25f;
-        offset %= 1;
+        void Awake()
+        {
+            mr = GetComponent<MeshRenderer>();
+            materialParameters = new MaterialPropertyBlock();
+        }
 
-        mr.GetPropertyBlock(materialParameters);
-        materialParameters.SetVector("_MainTex_ST", new Vector4(1, 1, offset, 0));
-        mr.SetPropertyBlock(materialParameters);
+        float offset = 0;
+
+        void Update()
+        {
+            offset += Time.deltaTime * .25f;
+            offset %= 1;
+
+            mr.GetPropertyBlock(materialParameters);
+            materialParameters.SetVector("_MainTex_ST", new Vector4(1, 1, offset, 0));
+            mr.SetPropertyBlock(materialParameters);
+        }
     }
 }

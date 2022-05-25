@@ -15,79 +15,82 @@
 
 using System.Collections.Generic;
 
-public sealed class SidedefsTracePath : List<Sidedef>
+namespace DoomLoader
 {
-    #region ================== Constants
-
-    #endregion
-
-    #region ================== Variables
-
-    #endregion
-
-    #region ================== Properties
-
-    #endregion
-
-    #region ================== Constructor / Disposer
-
-    // Constructor
-    public SidedefsTracePath()
+    public sealed class SidedefsTracePath : List<Sidedef>
     {
-        // Initialize
-    }
+        #region ================== Constants
 
-    // Constructor
-    public SidedefsTracePath(SidedefsTracePath p, Sidedef add) : base(p)
-    {
-        // Initialize
-        base.Add(add);
-    }
+        #endregion
 
-    #endregion
+        #region ================== Variables
 
-    #region ================== Methods
+        #endregion
 
-    // This checks if the polygon is closed
-    public bool CheckIsClosed()
-    {
-        // There must be at least 2 sidedefs
-        if (base.Count > 1)
+        #region ================== Properties
+
+        #endregion
+
+        #region ================== Constructor / Disposer
+
+        // Constructor
+        public SidedefsTracePath()
         {
-            // The end sidedef must share a vertex with the first
-            return (base[0].Line.Start == base[base.Count - 1].Line.Start) ||
-                   (base[0].Line.Start == base[base.Count - 1].Line.End) ||
-                   (base[0].Line.End == base[base.Count - 1].Line.Start) ||
-                   (base[0].Line.End == base[base.Count - 1].Line.End);
+            // Initialize
         }
-        else
+
+        // Constructor
+        public SidedefsTracePath(SidedefsTracePath p, Sidedef add) : base(p)
         {
-            // Not closed
-            return false;
+            // Initialize
+            base.Add(add);
         }
-    }
 
-    // This makes a polygon from the path
-    public EarClipPolygon MakePolygon()
-    {
-        EarClipPolygon p = new EarClipPolygon();
+        #endregion
 
-        // Any sides at all?
-        if (base.Count > 0)
+        #region ================== Methods
+
+        // This checks if the polygon is closed
+        public bool CheckIsClosed()
         {
-            // Add all sides
-            for (int i = 0; i < base.Count; i++)
+            // There must be at least 2 sidedefs
+            if (base.Count > 1)
             {
-                // On front or back?
-                if (base[i].IsFront)
-                    p.AddLast(new EarClipVertex(base[i].Line.End.Position, base[i]));
-                else
-                    p.AddLast(new EarClipVertex(base[i].Line.Start.Position, base[i]));
+                // The end sidedef must share a vertex with the first
+                return (base[0].Line.Start == base[base.Count - 1].Line.Start) ||
+                       (base[0].Line.Start == base[base.Count - 1].Line.End) ||
+                       (base[0].Line.End == base[base.Count - 1].Line.Start) ||
+                       (base[0].Line.End == base[base.Count - 1].Line.End);
+            }
+            else
+            {
+                // Not closed
+                return false;
             }
         }
 
-        return p;
-    }
+        // This makes a polygon from the path
+        public EarClipPolygon MakePolygon()
+        {
+            EarClipPolygon p = new EarClipPolygon();
 
-    #endregion
+            // Any sides at all?
+            if (base.Count > 0)
+            {
+                // Add all sides
+                for (int i = 0; i < base.Count; i++)
+                {
+                    // On front or back?
+                    if (base[i].IsFront)
+                        p.AddLast(new EarClipVertex(base[i].Line.End.Position, base[i]));
+                    else
+                        p.AddLast(new EarClipVertex(base[i].Line.Start.Position, base[i]));
+                }
+            }
+
+            return p;
+        }
+
+        #endregion
+    }
 }

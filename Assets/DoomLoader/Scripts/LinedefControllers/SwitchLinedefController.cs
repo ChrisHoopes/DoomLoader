@@ -1,88 +1,91 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.Events;
-using System;
 
-/// <summary>
-/// All switch linedefs use this controller with lambda functions on activation
-/// </summary>
-public class SwitchLinedefController : MonoBehaviour, Pokeable
+namespace DoomLoader
 {
-    AudioSource audioSource;
-    public string CurrentTexture = "";
-
-    public bool activated = false;
-    public UnityEvent OnActivate = new UnityEvent();
-
-    public bool Repeatable = false;
-    public bool AutoReturn = false;
-    public float AutoReturnTime = 1f;
-
-    //requirement to be allowed to activate the switch
-    public Func<bool> Prereq = new Func<bool>(() => { return true; });
-
-    public bool Poke(GameObject caller)
+    /// <summary>
+    /// All switch linedefs use this controller with lambda functions on activation
+    /// </summary>
+    public class SwitchLinedefController : MonoBehaviour, Pokeable
     {
-        if (!Prereq())
-            return false;
+        AudioSource audioSource;
+        public string CurrentTexture = "";
 
-        if (!Repeatable)
-            if (activated)
+        public bool activated = false;
+        public UnityEvent OnActivate = new UnityEvent();
+
+        public bool Repeatable = false;
+        public bool AutoReturn = false;
+        public float AutoReturnTime = 1f;
+
+        //requirement to be allowed to activate the switch
+        public Func<bool> Prereq = new Func<bool>(() => { return true; });
+
+        public bool Poke(GameObject caller)
+        {
+            if (!Prereq())
                 return false;
 
-        if (AutoReturn)
-            time = AutoReturnTime;
+            if (!Repeatable)
+                if (activated)
+                    return false;
 
-        activated = !activated;
+            if (AutoReturn)
+                time = AutoReturnTime;
 
-        TextureLoader.Instance.SwapSwitchTexture(GetComponent<MeshRenderer>());
+            activated = !activated;
 
-        //only actual switches make sound
-        if (CurrentTexture.Substring(0, 2) == "SW")
-            audioSource.Play();
+            TextureLoader.Instance.SwapSwitchTexture(GetComponent<MeshRenderer>());
 
-        OnActivate.Invoke();
-        return true;
-    }
+            //only actual switches make sound
+            if (CurrentTexture.Substring(0, 2) == "SW")
+                audioSource.Play();
 
-    private void Start()
-    {
-        //"invisible" switch
-        if (CurrentTexture.Substring(0, 2) != "SW")
-            return;
+            OnActivate.Invoke();
+            return true;
+        }
 
-        GameObject audioPosition = new GameObject("Audio Position");
-        audioPosition.transform.position = GetComponent<MeshFilter>().mesh.bounds.center;
-        audioPosition.transform.SetParent(transform, true);
-        audioSource = audioPosition.AddComponent<AudioSource>();
-        audioSource.playOnAwake = false;
-        audioSource.spatialBlend = 1f;
-        audioSource.clip = SoundLoader.Instance.LoadSound("DSSWTCHN");
-
-        if (!AutoReturn)
-            enabled = false;
-    }
-
-    public float time = 0f;
-    private void Update()
-    {
-        if (GameManager.Paused)
-            return;
-
-        if (time <= 0)
-            return;
-        else
+        private void Start()
         {
-            time -= Time.deltaTime;
+            //"invisible" switch
+            if (CurrentTexture.Substring(0, 2) != "SW")
+                return;
+
+            GameObject audioPosition = new GameObject("Audio Position");
+            audioPosition.transform.position = GetComponent<MeshFilter>().mesh.bounds.center;
+            audioPosition.transform.SetParent(transform, true);
+            audioSource = audioPosition.AddComponent<AudioSource>();
+            audioSource.playOnAwake = false;
+            audioSource.spatialBlend = 1f;
+            audioSource.clip = SoundLoader.Instance.LoadSound("DSSWTCHN");
+
+            if (!AutoReturn)
+                enabled = false;
+        }
+
+        public float time = 0f;
+        private void Update()
+        {
+            if (GameManager.Paused)
+                return;
+
             if (time <= 0)
+                return;
+            else
             {
-                activated = !activated;
-                TextureLoader.Instance.SwapSwitchTexture(GetComponent<MeshRenderer>());
+                time -= Time.deltaTime;
+                if (time <= 0)
+                {
+                    activated = !activated;
+                    TextureLoader.Instance.SwapSwitchTexture(GetComponent<MeshRenderer>());
+                }
             }
         }
-    }
 
-    public bool AllowMonsters()
-    {
-        return false;
+        public bool AllowMonsters()
+        {
+            return false;
+        }
     }
 }

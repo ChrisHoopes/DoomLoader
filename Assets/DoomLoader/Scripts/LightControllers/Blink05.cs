@@ -1,29 +1,32 @@
 ﻿using UnityEngine;
 
-public class Blink05 : MonoBehaviour 
+namespace DoomLoader
 {
-    Light l;
-    public float offIntensity = 0f;
-    public float onIntensity = 1f;
-
-    void Awake()
+    public class Blink05 : MonoBehaviour 
     {
-        l = GetComponent<Light>();
-    }
+        Light l;
+        public float offIntensity = 0f;
+        public float onIntensity = 1f;
 
-    float time;
-    bool flip;
-
-    void Update()
-    {
-        time += Time.deltaTime;
-
-        if (time >= .5f)
+        void Awake()
         {
-            time = 0;
-            flip = !flip;
+            l = GetComponent<Light>();
+        }
 
-            l.intensity = flip ? onIntensity : offIntensity;
+        float time;
+        bool flip;
+
+        void Update()
+        {
+            time += Time.deltaTime;
+
+            if (time >= .5f)
+            {
+                time = 0;
+                flip = !flip;
+
+                l.intensity = flip ? onIntensity : offIntensity;
+            }
         }
     }
 }

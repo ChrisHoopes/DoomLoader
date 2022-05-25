@@ -1,153 +1,156 @@
 ﻿using UnityEngine;
 
-public class GameManager : MonoBehaviour
+namespace DoomLoader
 {
-    public string autoloadWad = "Doom1.WAD";
-    public string autoloadMap = "E1M1";
-
-    public static GameManager Instance;
-
-    public float gravity = 30f;
-    public float terminalVelocity = 100f;
-
-    public const float maxStairHeight = MapLoader._24units;
-
-    public bool deathmatch;
-
-    public static bool Paused { get { return Instance.paused; } }
-
-    public bool paused = true;
-
-    public PlayerThing[] Player = new PlayerThing[1];
-    public GameObject BulletPuff;
-    public GameObject BloodDrop;
-    public GameObject TeleportEffect;
-
-    public Transform TemporaryObjectsHolder;
-
-    public float PlayerDamageReceive = .5f;
-
-    void Awake()
+    public class GameManager : MonoBehaviour
     {
-        Instance = this;
-    }
+        public string autoloadWad = "Doom1.WAD";
+        public string autoloadMap = "E1M1";
 
-    void Start ()
-    {
-        if (!string.IsNullOrEmpty(autoloadWad))
-            if (!WadLoader.LoadWad(autoloadWad))
-                return;
+        public static GameManager Instance;
 
-        TextureLoader.Instance.LoadAndBuildAll();
+        public float gravity = 30f;
+        public float terminalVelocity = 100f;
 
-        if (!string.IsNullOrEmpty(autoloadMap))
-            ChangeMap = autoloadMap;
-    }
+        public const float maxStairHeight = MapLoader._24units;
 
-    public string ChangeMap = "";
+        public bool deathmatch;
 
-    bool ready = false;
-    int skipFrames = 5;
+        public static bool Paused { get { return Instance.paused; } }
 
-	void Update ()
-    {
-        //skip frames are used to easen up Time.deltaTime after loading
-        if (ready)
-            if (skipFrames > 0)
-            {
-                skipFrames--;
+        public bool paused = true;
 
-                if (skipFrames == 0)
-                    paused = false;
-            }
+        public PlayerThing[] Player = new PlayerThing[1];
+        public GameObject BulletPuff;
+        public GameObject BloodDrop;
+        public GameObject TeleportEffect;
 
-        if (!string.IsNullOrEmpty(ChangeMap))
+        public Transform TemporaryObjectsHolder;
+
+        public float PlayerDamageReceive = .5f;
+
+        void Awake()
         {
-            paused = true;
-
-            skipFrames = 5;
-            ready = false;
-
-            MapLoader.Unload();
-            if (MapLoader.Load(ChangeMap))
-            {
-                TheGrid.Init();
-                Mesher.CreateMeshes();
-                MapLoader.ApplyLinedefBehavior();
-                ThingManager.Instance.CreateThings(false);
-                AI.CreateHeatmap();
-
-                //DebugObjects.DrawHeatmap();
-
-                Init();
-            }
-
-            ChangeMap = "";
-        }
-    }
-
-    public void Init()
-    {
-        if (PlayerStart.PlayerStarts[0] == null)
-            Debug.LogError("PlayerStart1 == null");
-        else
-        {
-            Player[0].transform.position = PlayerStart.PlayerStarts[0].transform.position + Vector3.up * PlayerControls.Instance.centerHeight;
-            Player[0].transform.rotation = PlayerStart.PlayerStarts[0].transform.rotation;
-            PlayerControls.Instance.viewDirection.y = Player[0].transform.rotation.eulerAngles.y;
+            Instance = this;
         }
 
-        if (PlayerWeapon.Instance == null)
-            PlayerControls.Instance.SwapToBestWeapon();
-
-        for (int i = 0; i < PlayerInfo.Instance.Keycards.Length; i++)
-            PlayerInfo.Instance.Keycards[i] = false;
-
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-
-        PlayerControls.Instance.gravityAccumulator = 0f;
-
-        MusicPlayer.Instance.Play(MapLoader.CurrentMap);
-
-        ready = true;
-    }
-
-    void OnApplicationFocus(bool hasFocus)
-    {
-        paused = !hasFocus;
-
-        if (hasFocus)
+        void Start ()
         {
+            if (!string.IsNullOrEmpty(autoloadWad))
+                if (!WadLoader.LoadWad(autoloadWad))
+                    return;
+
+            TextureLoader.Instance.LoadAndBuildAll();
+
+            if (!string.IsNullOrEmpty(autoloadMap))
+                ChangeMap = autoloadMap;
+        }
+
+        public string ChangeMap = "";
+
+        bool ready = false;
+        int skipFrames = 5;
+
+        void Update ()
+        {
+            //skip frames are used to easen up Time.deltaTime after loading
+            if (ready)
+                if (skipFrames > 0)
+                {
+                    skipFrames--;
+
+                    if (skipFrames == 0)
+                        paused = false;
+                }
+
+            if (!string.IsNullOrEmpty(ChangeMap))
+            {
+                paused = true;
+
+                skipFrames = 5;
+                ready = false;
+
+                MapLoader.Unload();
+                if (MapLoader.Load(ChangeMap))
+                {
+                    TheGrid.Init();
+                    Mesher.CreateMeshes();
+                    MapLoader.ApplyLinedefBehavior();
+                    ThingManager.Instance.CreateThings(false);
+                    AI.CreateHeatmap();
+
+                    //DebugObjects.DrawHeatmap();
+
+                    Init();
+                }
+
+                ChangeMap = "";
+            }
+        }
+
+        public void Init()
+        {
+            if (PlayerStart.PlayerStarts[0] == null)
+                UnityEngine.Debug.LogError("PlayerStart1 == null");
+            else
+            {
+                Player[0].transform.position = PlayerStart.PlayerStarts[0].transform.position + Vector3.up * PlayerControls.Instance.centerHeight;
+                Player[0].transform.rotation = PlayerStart.PlayerStarts[0].transform.rotation;
+                PlayerControls.Instance.viewDirection.y = Player[0].transform.rotation.eulerAngles.y;
+            }
+
+            if (PlayerWeapon.Instance == null)
+                PlayerControls.Instance.SwapToBestWeapon();
+
+            for (int i = 0; i < PlayerInfo.Instance.Keycards.Length; i++)
+                PlayerInfo.Instance.Keycards[i] = false;
+
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
+
+            PlayerControls.Instance.gravityAccumulator = 0f;
+
+            MusicPlayer.Instance.Play(MapLoader.CurrentMap);
+
+            ready = true;
         }
-    }
 
-    public static void Create3DSound(Vector3 position, string soundName, float minDistance)
-    {
-        Create3DSound(position, SoundLoader.Instance.LoadSound(soundName), minDistance);
-    }
+        void OnApplicationFocus(bool hasFocus)
+        {
+            paused = !hasFocus;
 
-    public static void Create3DSound(Vector3 position, AudioClip clip, float minDistance)
-    {
-        GameObject sound = new GameObject("3dsound");
-        sound.transform.position = position;
-        sound.transform.SetParent(Instance.TemporaryObjectsHolder);
+            if (hasFocus)
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+            }
+        }
 
-        AudioSource audioSource = sound.AddComponent<AudioSource>();
-        audioSource.clip = clip;
-        audioSource.loop = false;
-        audioSource.spatialBlend = 1f;
-        audioSource.minDistance = minDistance;
-        audioSource.Play();
+        public static void Create3DSound(Vector3 position, string soundName, float minDistance)
+        {
+            Create3DSound(position, SoundLoader.Instance.LoadSound(soundName), minDistance);
+        }
 
-        sound.AddComponent<DestroyAfterSoundPlayed>();
-    }
+        public static void Create3DSound(Vector3 position, AudioClip clip, float minDistance)
+        {
+            GameObject sound = new GameObject("3dsound");
+            sound.transform.position = position;
+            sound.transform.SetParent(Instance.TemporaryObjectsHolder);
 
-    public static void PauseForever()
-    {
-        Instance.ready = false;
-        Instance.paused = true;
+            AudioSource audioSource = sound.AddComponent<AudioSource>();
+            audioSource.clip = clip;
+            audioSource.loop = false;
+            audioSource.spatialBlend = 1f;
+            audioSource.minDistance = minDistance;
+            audioSource.Play();
+
+            sound.AddComponent<DestroyAfterSoundPlayed>();
+        }
+
+        public static void PauseForever()
+        {
+            Instance.ready = false;
+            Instance.paused = true;
+        }
     }
 }

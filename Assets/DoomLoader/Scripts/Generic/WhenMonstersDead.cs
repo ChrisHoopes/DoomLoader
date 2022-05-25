@@ -3,37 +3,40 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class WhenMonstersDead : MonoBehaviour
+namespace DoomLoader
 {
-    public List<MonsterController> monsters = new List<MonsterController>();
-    public UnityEvent OnLastMonsterDie = new UnityEvent();
-    public int MonsterID = 3003; //Baron of Hell
-
-    private void Start()
+    public class WhenMonstersDead : MonoBehaviour
     {
-        enabled = false;
-        StartCoroutine(WaitOneSecondAndEnable());
-    }
+        public List<MonsterController> monsters = new List<MonsterController>();
+        public UnityEvent OnLastMonsterDie = new UnityEvent();
+        public int MonsterID = 3003; //Baron of Hell
 
-    IEnumerator WaitOneSecondAndEnable()
-    {
-        yield return new WaitForSeconds(1);
+        private void Start()
+        {
+            enabled = false;
+            StartCoroutine(WaitOneSecondAndEnable());
+        }
 
-        foreach (ThingController t in GameManager.Instance.transform.Find("MapThings").GetComponentsInChildren<ThingController>())
-            if (t.thingID == MonsterID)
-                monsters.Add(t.GetComponent<MonsterController>());
+        IEnumerator WaitOneSecondAndEnable()
+        {
+            yield return new WaitForSeconds(1);
 
-        enabled = true;
-    }
+            foreach (ThingController t in GameManager.Instance.transform.Find("MapThings").GetComponentsInChildren<ThingController>())
+                if (t.thingID == MonsterID)
+                    monsters.Add(t.GetComponent<MonsterController>());
 
-    private void Update()
-    {
-        foreach (MonsterController monster in monsters)
-            if (!monster.Dead)
-                return;
+            enabled = true;
+        }
 
-        OnLastMonsterDie.Invoke();
+        private void Update()
+        {
+            foreach (MonsterController monster in monsters)
+                if (!monster.Dead)
+                    return;
 
-        enabled = false;
+            OnLastMonsterDie.Invoke();
+
+            enabled = false;
+        }
     }
 }
