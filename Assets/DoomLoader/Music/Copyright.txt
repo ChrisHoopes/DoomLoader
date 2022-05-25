@@ -1,0 +1,1 @@
+Original songs are pre-synthesized by me from the midi files in the .WAD using SoundFont Midi Player by Zoltán Bacskó (Falcosoft)
